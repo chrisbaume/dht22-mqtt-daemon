@@ -25,8 +25,6 @@ else:
 pin = config['climate-sensor'].get('pin', 10)
 topic = config['climate-sensor'].get('topic', 'temperature/dht22')
 decim_digits = config['climate-sensor'].getint('decimal_digits', 2)
-sleep_time = config['climate-sensor'].getint('interval', 60)
-
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
