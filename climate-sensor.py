@@ -11,7 +11,7 @@ import os
 config = ConfigParser(delimiters=('=', ))
 config.read(os.path.dirname(os.path.realpath(__file__))+'/config.ini')
 
-sensor_type = config['sensor'].get('type', 'dht22').lower()
+sensor_type = config['climate-sensor'].get('type', 'dht22').lower()
 
 if sensor_type == 'dht22':
     sensor = Adafruit_DHT.DHT22
@@ -22,10 +22,10 @@ elif sensor_type == 'am2302':
 else:
     raise Exception('Supported sensor types: DHT22, DHT11, AM2302')
 
-pin = config['sensor'].get('pin', 10)
-topic = config['mqtt'].get('topic', 'temperature/dht22')
-decim_digits = config['sensor'].getint('decimal_digits', 2)
-sleep_time = config['sensor'].getint('interval', 60)
+pin = config['climate-sensor'].get('pin', 10)
+topic = config['climate-sensor'].get('topic', 'temperature/dht22')
+decim_digits = config['climate-sensor'].getint('decimal_digits', 2)
+sleep_time = config['climate-sensor'].getint('interval', 60)
 
 
 # The callback for when the client receives a CONNACK response from the server.
