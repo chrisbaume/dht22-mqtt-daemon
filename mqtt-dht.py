@@ -5,9 +5,11 @@ import time
 import Adafruit_DHT
 from configparser import ConfigParser
 import json
+import struct
+import os
 
 config = ConfigParser(delimiters=('=', ))
-config.read('config.ini')
+config.read(os.path.dirname(os.path.realpath(__file__))+'/config.ini')
 
 sensor_type = config['sensor'].get('type', 'dht22').lower()
 
@@ -28,7 +30,8 @@ sleep_time = config['sensor'].getint('interval', 60)
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, rc):
-    print("Connected with result code {}".format(rc))
+    #print("Connected with result code {}".format(rc))
+    return
 
 client = mqtt.Client()
 client.on_connect = on_connect
@@ -37,18 +40,10 @@ client.connect(config['mqtt'].get('hostname', 'homeassistant'),
                config['mqtt'].getint('timeout', 60))
 client.loop_start()
 
-while True:
+humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
 
-    humidity, temperature = Adafruit_DHT.read_retry(sensor, pin)
+if humidity is not None and temperature is not None:
+    data = {'temperature': round(temperature, decim_digits),
+            'humidity': round(humidity, decim_digits)}
 
-    if humidity is not None and temperature is not None:
-        data = {'temperature': round(temperature, decim_digits),
-                'humidity': round(humidity, decim_digits)}
-
-        client.publish(topic, json.dumps(data))
-
-        print('Published. Sleeping ...')
-    else:
-        print('Failed to get reading. Skipping ...')
-
-    time.sleep(sleep_time)
+    client.publish(topic, json.dumps(data))
